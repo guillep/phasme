@@ -53,6 +53,18 @@ PhSimpleCompilerTests >> testCompileFunctionCall [
 ]
 
 { #category : #tests }
+PhSimpleCompilerTests >> testCompileFunctionCallWithArguments [
+
+	| program result |
+	program := self compileFunctions: {
+		'_main ^ self call: 17'.
+		'call: param ^ param + 2'
+		}.
+	result := self execute: program.
+	self assert: result equals: 19
+]
+
+{ #category : #tests }
 PhSimpleCompilerTests >> testCompileImplicitReturn [
 
 	| program result |

@@ -56,10 +56,16 @@ PhPharoCompiler >> compileFunctionCall: aFunctionCall [
 		self foo: 17.
 	Ignore the receiver self, and compile it like foo(17)"
 	
-	aFunctionCall arguments size > 0 ifTrue: [ self error: 'not supported yet' ].
+	aFunctionCall arguments size > 1 ifTrue: [ self error: 'not supported yet' ].
 	
-	aFunctionCall arguments do: [ :arg | arg accept: self ].
-	builder call: aFunctionCall selector.
+	aFunctionCall arguments do: [ :arg | arg acceptVisitor: self ].
+	
+	"Calling convention. First argument goes in RDI, second in RSI"
+	aFunctionCall arguments size > 1
+		ifTrue: [ builder popRegister: 'rsi' ].
+	aFunctionCall arguments size > 0
+		ifTrue: [ builder popRegister: 'rdi' ].
+	builder call: (self mangleSelector: aFunctionCall selector).
 	builder pushRegister: 'rax'.
 ]
 
@@ -73,6 +79,15 @@ PhPharoCompiler >> initialize [
 	
 	localPositions := Dictionary new.
 	nextStackPosition := 0
+]
+
+{ #category : #visiting }
+PhPharoCompiler >> mangleSelector: aSelector [
+	"ASM does not like to have colons. Replace them with dashes (-) and escape dashes"
+	
+	| escaped |
+	escaped := aSelector copyReplaceAll: 'arbitrario' with: 'arbitrarioarbitrario'.
+	^ escaped copyReplaceAll: ':' with: 'arbitrario'
 ]
 
 { #category : #initialization }
@@ -128,7 +143,7 @@ PhPharoCompiler >> visitMessageNode: aRBMessageNode [
 { #category : #visiting }
 PhPharoCompiler >> visitMethodNode: aRBMethodNode [ 
 	
-	builder globalLabel: aRBMethodNode selector.
+	builder globalLabel: (self mangleSelector: aRBMethodNode selector).
 	aRBMethodNode temporaries do: [ :e |
 		self reserveStackPositionFor: e.
 	].
@@ -158,7 +173,19 @@ PhPharoCompiler >> visitReturnNode: aRBReturnNode [
 ]
 
 { #category : #visiting }
-PhPharoCompiler >> visitVariableNode: aRBVariableNode [ 
+PhPharoCompiler >> visitVariableNode: aRBVariableNode [
+	
+	"Calling convention:
+		1st param: RDI
+		2nd param: RSI
+	"
+	| parameterIndex |
+	parameterIndex := aRBVariableNode methodNode arguments indexOf: aRBVariableNode.
+	parameterIndex > 0 "is parameter?" ifTrue: [
+		parameterIndex = 1 ifTrue: [ ^ builder pushRegister: 'rdi' ].
+		parameterIndex = 2 ifTrue: [ ^ builder pushRegister: 'rsi' ].
+		self error: 'Unsupported number of parameters'
+	].
 	
 	builder loadRegister: 'rbp' offset: (localPositions at: aRBVariableNode name) intoRegister: 'rax'.
 	builder pushRegister: 'rax'
