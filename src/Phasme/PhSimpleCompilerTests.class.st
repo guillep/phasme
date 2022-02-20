@@ -12,6 +12,15 @@ PhSimpleCompilerTests >> compile: pharoMethodSource [
 ]
 
 { #category : #tests }
+PhSimpleCompilerTests >> compileFunctions: aCollection [
+
+	| compiler |
+	compiler := PhPharoCompiler new.
+	aCollection do: [ :each | compiler addMethod: each ].
+	^ compiler compile
+]
+
+{ #category : #tests }
 PhSimpleCompilerTests >> execute: compiledPhasme [
 	
 	| simulator |
@@ -27,6 +36,18 @@ PhSimpleCompilerTests >> testCompileArithmetics [
 
 	| program result |
 	program := self compile: '_main ^ 1 + 2'.
+	result := self execute: program.
+	self assert: result equals: 3
+]
+
+{ #category : #tests }
+PhSimpleCompilerTests >> testCompileFunctionCall [
+
+	| program result |
+	program := self compileFunctions: {
+		'_main ^ self call'.
+		'call ^ 1 + 2'
+		}.
 	result := self execute: program.
 	self assert: result equals: 3
 ]

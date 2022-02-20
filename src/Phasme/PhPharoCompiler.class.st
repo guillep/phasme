@@ -32,6 +32,37 @@ PhPharoCompiler >> compile [
 	^ builder compile
 ]
 
+{ #category : #visiting }
+PhPharoCompiler >> compileAdd: addNode [
+	
+	addNode receiver acceptVisitor: self.
+	addNode arguments first acceptVisitor: self.
+	
+	"Put the second operand in rbx"
+	builder popRegister: 'rbx'.
+	"Put the first operand in rax"
+	builder popRegister: 'rax'.
+	"add them up!"
+	builder addRegister: 'rbx' to: 'rax'.
+	
+	"Push the result to the stack"
+	builder pushRegister: 'rax'
+]
+
+{ #category : #visiting }
+PhPharoCompiler >> compileFunctionCall: aFunctionCall [
+	
+	"This is a function call like
+		self foo: 17.
+	Ignore the receiver self, and compile it like foo(17)"
+	
+	aFunctionCall arguments size > 0 ifTrue: [ self error: 'not supported yet' ].
+	
+	aFunctionCall arguments do: [ :arg | arg accept: self ].
+	builder call: aFunctionCall selector.
+	builder pushRegister: 'rax'.
+]
+
 { #category : #initialization }
 PhPharoCompiler >> initialize [
 	super initialize.
@@ -85,20 +116,13 @@ PhPharoCompiler >> visitLiteralValueNode: aRBLiteralValueNode [
 { #category : #visiting }
 PhPharoCompiler >> visitMessageNode: aRBMessageNode [ 
 	
-	self haltIf: [ aRBMessageNode arguments size > 1 ].
+	"We only know how to compile a sum for now"
+	aRBMessageNode selector = #+
+		ifTrue: [ ^ self compileAdd: aRBMessageNode ].
+
+	self compileFunctionCall: aRBMessageNode
 	
-	aRBMessageNode receiver acceptVisitor: self.
-	aRBMessageNode arguments first acceptVisitor: self.
 	
-	"Put the second operand in rbx"
-	builder popRegister: 'rbx'.
-	"Put the first operand in rax"
-	builder popRegister: 'rax'.
-	"add them up!"
-	builder addRegister: 'rbx' to: 'rax'.
-	
-	"Push the result to the stack"
-	builder pushRegister: 'rax'
 ]
 
 { #category : #visiting }
