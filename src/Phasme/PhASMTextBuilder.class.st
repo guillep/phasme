@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'instructions',
-		'phasme'
+		'phasme',
+		'labelCount'
 	],
 	#category : #'Phasme-Assembler'
 }
@@ -110,6 +111,12 @@ PhASMTextBuilder >> move: origin to: destination [
 	instructions add: (PhMove from: origin to: destination)
 ]
 
+{ #category : #building }
+PhASMTextBuilder >> multiplyRegister: operand to: aString [ 
+	
+	^ instructions add: (PhMultiplyRegister source: operand destination: aString)
+]
+
 { #category : #accessing }
 PhASMTextBuilder >> phasme: aPhASM [
 
@@ -158,6 +165,12 @@ PhASMTextBuilder >> string: aString [
 	string := PhString id: instructions size value: aString.
 	instructions add: string.
 	^ string
+]
+
+{ #category : #building }
+PhASMTextBuilder >> subtractRegister: operand to: aString [ 
+	
+	^ instructions add: (PhSubtractRegister source: operand destination: aString)
 ]
 
 { #category : #building }

@@ -32,15 +32,6 @@ PhSimpleCompilerTests >> execute: compiledPhasme [
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> testCompileArithmetics [
-
-	| program result |
-	program := self compile: '_main ^ 1 + 2'.
-	result := self execute: program.
-	self assert: result equals: 3
-]
-
-{ #category : #tests }
 PhSimpleCompilerTests >> testCompileFunctionCall [
 
 	| program result |
@@ -85,10 +76,37 @@ PhSimpleCompilerTests >> testCompileLocalVariables [
 ]
 
 { #category : #tests }
+PhSimpleCompilerTests >> testCompileMultiply [
+
+	| program result |
+	program := self compile: '_main ^ 2 * 3'.
+	result := self execute: program.
+	self assert: result equals: 6
+]
+
+{ #category : #tests }
 PhSimpleCompilerTests >> testCompileReturnValue [
 
 	| program result |
 	program := self compile: '_main ^ 17'.
 	result := self execute: program.
 	self assert: result equals: 17
+]
+
+{ #category : #tests }
+PhSimpleCompilerTests >> testCompileSubtract [
+
+	| program result |
+	program := self compile: '_main ^ 2 - 1'.
+	result := self execute: program.
+	self assert: result equals: 1
+]
+
+{ #category : #tests }
+PhSimpleCompilerTests >> testCompileSum [
+
+	| program result |
+	program := self compile: '_main ^ 1 + 2'.
+	result := self execute: program.
+	self assert: result equals: 3
 ]

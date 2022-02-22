@@ -69,6 +69,40 @@ PhPharoCompiler >> compileFunctionCall: aFunctionCall [
 	builder pushRegister: 'rax'.
 ]
 
+{ #category : #visiting }
+PhPharoCompiler >> compileMultiply: addNode [
+	
+	addNode receiver acceptVisitor: self.
+	addNode arguments first acceptVisitor: self.
+	
+	"Put the second operand in rbx"
+	builder popRegister: 'rbx'.
+	"Put the first operand in rax"
+	builder popRegister: 'rax'.
+	"subtract them"
+	builder multiplyRegister: 'rbx' to: 'rax'.
+	
+	"Push the result to the stack"
+	builder pushRegister: 'rax'
+]
+
+{ #category : #visiting }
+PhPharoCompiler >> compileSubtract: addNode [
+	
+	addNode receiver acceptVisitor: self.
+	addNode arguments first acceptVisitor: self.
+	
+	"Put the second operand in rbx"
+	builder popRegister: 'rbx'.
+	"Put the first operand in rax"
+	builder popRegister: 'rax'.
+	"subtract them"
+	builder subtractRegister: 'rbx' to: 'rax'.
+	
+	"Push the result to the stack"
+	builder pushRegister: 'rax'
+]
+
 { #category : #initialization }
 PhPharoCompiler >> initialize [
 	super initialize.
@@ -134,6 +168,12 @@ PhPharoCompiler >> visitMessageNode: aRBMessageNode [
 	"We only know how to compile a sum for now"
 	aRBMessageNode selector = #+
 		ifTrue: [ ^ self compileAdd: aRBMessageNode ].
+	aRBMessageNode selector = #-
+		ifTrue: [ ^ self compileSubtract: aRBMessageNode ].
+	aRBMessageNode selector = #*
+		ifTrue: [ ^ self compileMultiply: aRBMessageNode ].
+	aRBMessageNode selector = #ifTrue:ifFalse:
+		ifTrue: [ ^ self compileConditional: aRBMessageNode ].
 
 	self compileFunctionCall: aRBMessageNode
 	
