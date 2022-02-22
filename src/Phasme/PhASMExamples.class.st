@@ -88,6 +88,7 @@ PhASMExamples >> loop [
 
 	"Loop"
 
+	| header exit |
 	PhASM new text: [ :builder | 
 		| string |
 		string := builder string: 'hello world? %d'.
@@ -95,13 +96,15 @@ PhASMExamples >> loop [
 			globalLabel: '_main';
 			push: 'rbp';
 			move: 'rsp' to: 'rbp';
-			loadValue: 0 intoRegister: 'rsi';
-			label: 'loopheader';
+			loadValue: 0 intoRegister: 'rsi'.
+		header := builder label: 'loopheader'.
+		builder
 			compare: 56 to: 'rsi';
 			jumpIfEqualsTo: 'exit';
 			add: 2 to: 'rsi';
-			jumpTo: 'loopheader';
-			label: 'exit';
+			jumpTo: header.
+		exit := builder label: 'exit'.
+		builder
 			loadReference: string intoRegister: 'rdi';
 			call: '_printf';
 			pop: 'rbp';

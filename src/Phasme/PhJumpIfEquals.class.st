@@ -32,5 +32,5 @@ PhJumpIfEquals >> writeInTextSectionOnStream: aWriteStream [
 	aWriteStream
 		tab;
 		nextPutAll: 'je ';
-		nextPutAll: label asString
+		nextPutAll: label name asString
 ]

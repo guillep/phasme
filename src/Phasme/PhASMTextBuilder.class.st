@@ -33,6 +33,12 @@ PhASMTextBuilder >> compare: aLiteral to: aRegister [
 	instructions add: (PhCompare value: aLiteral destination: aRegister)
 ]
 
+{ #category : #building }
+PhASMTextBuilder >> compareRegister: register1 toRegister: register2 [
+	
+	instructions add: (PhCompareRegisters register1: register1 register2: register2)
+]
+
 { #category : #compiling }
 PhASMTextBuilder >> compile [
 	
@@ -56,13 +62,26 @@ PhASMTextBuilder >> globalLabel: aString [
 { #category : #building }
 PhASMTextBuilder >> initialize [
 	super initialize.
-	instructions := OrderedCollection new
+	instructions := OrderedCollection new.
+	labelCount := 0.
 ]
 
 { #category : #enumerating }
 PhASMTextBuilder >> instructionsDo: aFullBlockClosure [ 
 	
 	instructions do: aFullBlockClosure
+]
+
+{ #category : #building }
+PhASMTextBuilder >> jump [
+
+	^ instructions add: PhJump new
+]
+
+{ #category : #building }
+PhASMTextBuilder >> jumpIfEquals [
+	
+	^ instructions add: (PhJumpIfEquals new)
 ]
 
 { #category : #building }
@@ -117,6 +136,12 @@ PhASMTextBuilder >> multiplyRegister: operand to: aString [
 	^ instructions add: (PhMultiplyRegister source: operand destination: aString)
 ]
 
+{ #category : #building }
+PhASMTextBuilder >> newLabel [
+
+	^ self label: 'L' , (labelCount := labelCount + 1) asString
+]
+
 { #category : #accessing }
 PhASMTextBuilder >> phasme: aPhASM [
 
@@ -146,6 +171,12 @@ PhASMTextBuilder >> pushValue: aNumber [
 PhASMTextBuilder >> return [
 	
 	instructions add: PhReturn new
+]
+
+{ #category : #building }
+PhASMTextBuilder >> setEqualsConditionCodeToRegister: register [
+	
+	instructions add: (PhSetEqualsConditionCode new destination: register; yourself)
 ]
 
 { #category : #building }

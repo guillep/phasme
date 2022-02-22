@@ -49,13 +49,59 @@ PhPharoCompiler >> compileAdd: addNode [
 	builder pushRegister: 'rax'
 ]
 
+{ #category : #compiling }
+PhPharoCompiler >> compileConditional: aConditional [ 
+	
+	"Compile this way.
+		condition
+		jumpiffalse falselabel
+	truelabel:	
+		code for true
+		jump end
+	falselabel:
+		code for false
+	end:
+		following instructions...
+	"
+	
+	"Condition should push a 0 if flase or 1 if true"
+	| ifEquals jumpEnd |
+	aConditional receiver acceptVisitor: self.
+	builder popRegister: 'rax'.
+	builder compare: 0 to: 'rax'.
+	ifEquals := builder jumpIfEquals.
+	aConditional arguments first acceptVisitor: self.
+	jumpEnd := builder jump.
+	ifEquals label: builder newLabel.
+	aConditional arguments second acceptVisitor: self.
+	jumpEnd label: builder newLabel
+]
+
+{ #category : #visiting }
+PhPharoCompiler >> compileEquals: equalsNode [
+	
+	equalsNode receiver acceptVisitor: self.
+	equalsNode arguments first acceptVisitor: self.
+	
+	"Put the second operand in rbx"
+	builder popRegister: 'rbx'.
+	"Put the first operand in rax"
+	builder popRegister: 'rax'.
+	
+	"Compare and set the value of the equals flag to rax"
+	builder compareRegister: 'rax' toRegister: 'rbx'.
+	builder setEqualsConditionCodeToRegister: 'rax'.
+	
+	"Push the result to the stack"
+	builder pushRegister: 'rax'
+]
+
 { #category : #visiting }
 PhPharoCompiler >> compileFunctionCall: aFunctionCall [
 	
 	"This is a function call like
 		self foo: 17.
 	Ignore the receiver self, and compile it like foo(17)"
-	
 	aFunctionCall arguments size > 1 ifTrue: [ self error: 'not supported yet' ].
 	
 	aFunctionCall arguments do: [ :arg | arg acceptVisitor: self ].
@@ -157,6 +203,12 @@ PhPharoCompiler >> visitAssignmentNode: aRBAssignmentNode [
 ]
 
 { #category : #visiting }
+PhPharoCompiler >> visitBlockNode: aRBBlockNode [ 
+	
+	aRBBlockNode statements do: [ :e | e acceptVisitor: self ].
+]
+
+{ #category : #visiting }
 PhPharoCompiler >> visitLiteralValueNode: aRBLiteralValueNode [ 
 	
 	builder pushValue: aRBLiteralValueNode value
@@ -172,6 +224,9 @@ PhPharoCompiler >> visitMessageNode: aRBMessageNode [
 		ifTrue: [ ^ self compileSubtract: aRBMessageNode ].
 	aRBMessageNode selector = #*
 		ifTrue: [ ^ self compileMultiply: aRBMessageNode ].
+	
+	aRBMessageNode selector = #=
+		ifTrue: [ ^ self compileEquals: aRBMessageNode ].
 	aRBMessageNode selector = #ifTrue:ifFalse:
 		ifTrue: [ ^ self compileConditional: aRBMessageNode ].
 

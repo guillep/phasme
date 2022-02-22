@@ -35,6 +35,11 @@ PhLabel >> isGlobal [
 ]
 
 { #category : #accessing }
+PhLabel >> name [
+	^ name
+]
+
+{ #category : #accessing }
 PhLabel >> name: aString [ 
 	name := aString
 ]

@@ -32,5 +32,5 @@ PhJump >> writeInTextSectionOnStream: aWriteStream [
 	aWriteStream
 		tab;
 		nextPutAll: 'jmp ';
-		nextPutAll: label asString
+		nextPutAll: label name asString
 ]

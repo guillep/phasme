@@ -32,6 +32,71 @@ PhSimpleCompilerTests >> execute: compiledPhasme [
 ]
 
 { #category : #tests }
+PhSimpleCompilerTests >> testCompileConditional [
+
+	| program result |
+	program := self compileFunctions: {
+		'_main ^ self factorial: 5'.
+		'factorial: arg
+			arg = 0
+				ifTrue: [ ^ 1 ]
+				ifFalse: [ ^ arg * (self factorial: arg - 1) ]'
+		}.
+	result := self execute: program.
+	self assert: result equals: 120
+]
+
+{ #category : #tests }
+PhSimpleCompilerTests >> testCompileEqualsFalse [
+
+	| program result |
+	program := self compile: '_main ^ 1 = 7'.
+	result := self execute: program.
+	self assert: result equals: 0
+]
+
+{ #category : #tests }
+PhSimpleCompilerTests >> testCompileEqualsFalseWithFullRAX [
+
+	| program result |
+	program := self compileFunctions: {
+		'_main
+			"returnLargeNumber should put a number larger than a byte in RAX"
+			self returnLargeNumber.
+			self call'.
+		'returnLargeNumber ^ 512'.
+		'call ^ 1 = 2'
+		}.
+	result := self execute: program.
+	self assert: result equals: 0
+]
+
+{ #category : #tests }
+PhSimpleCompilerTests >> testCompileEqualsTrue [
+
+	| program result |
+	program := self compile: '_main ^ 2 = 2'.
+	result := self execute: program.
+	self assert: result equals: 1
+]
+
+{ #category : #tests }
+PhSimpleCompilerTests >> testCompileEqualsTrueWithFullRAX [
+
+	| program result |
+	program := self compileFunctions: {
+		'_main
+			"returnLargeNumber should put a number larger than a byte in RAX"
+			self returnLargeNumber.
+			self call'.
+		'returnLargeNumber ^ 512'.
+		'call ^ 2 = 2'
+		}.
+	result := self execute: program.
+	self assert: result equals: 1
+]
+
+{ #category : #tests }
 PhSimpleCompilerTests >> testCompileFunctionCall [
 
 	| program result |
