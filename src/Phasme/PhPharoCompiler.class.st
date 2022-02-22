@@ -32,18 +32,28 @@ PhPharoCompiler >> compile [
 	^ builder compile
 ]
 
-{ #category : #visiting }
+{ #category : #compiling }
 PhPharoCompiler >> compileAdd: addNode [
+
+	self
+		compileBinaryOperator: addNode
+		doing: [ :r1 :r2 |
+			builder addRegister: r1 to: r2 ]
+]
+
+{ #category : #compiling }
+PhPharoCompiler >> compileBinaryOperator: aNode doing: aBlock [
 	
-	addNode receiver acceptVisitor: self.
-	addNode arguments first acceptVisitor: self.
+	"Compile operands, they will push the values to the stack"
+	aNode receiver acceptVisitor: self.
+	aNode arguments first acceptVisitor: self.
 	
 	"Put the second operand in rbx"
 	builder popRegister: 'rbx'.
 	"Put the first operand in rax"
 	builder popRegister: 'rax'.
-	"add them up!"
-	builder addRegister: 'rbx' to: 'rax'.
+	
+	aBlock value: 'rbx' value: 'rax'.
 	
 	"Push the result to the stack"
 	builder pushRegister: 'rax'
@@ -77,26 +87,18 @@ PhPharoCompiler >> compileConditional: aConditional [
 	jumpEnd label: builder newLabel
 ]
 
-{ #category : #visiting }
+{ #category : #compiling }
 PhPharoCompiler >> compileEquals: equalsNode [
 	
-	equalsNode receiver acceptVisitor: self.
-	equalsNode arguments first acceptVisitor: self.
-	
-	"Put the second operand in rbx"
-	builder popRegister: 'rbx'.
-	"Put the first operand in rax"
-	builder popRegister: 'rax'.
-	
-	"Compare and set the value of the equals flag to rax"
-	builder compareRegister: 'rax' toRegister: 'rbx'.
-	builder setEqualsConditionCodeToRegister: 'rax'.
-	
-	"Push the result to the stack"
-	builder pushRegister: 'rax'
+	self
+		compileBinaryOperator: equalsNode
+		doing: [ :r1 :r2 |
+			"Compare and set the value of the equals flag to rax"
+			builder compareRegister: r1 toRegister: r2.
+			builder setEqualsConditionCodeToRegister: r2 ]
 ]
 
-{ #category : #visiting }
+{ #category : #compiling }
 PhPharoCompiler >> compileFunctionCall: aFunctionCall [
 	
 	"This is a function call like
@@ -115,38 +117,22 @@ PhPharoCompiler >> compileFunctionCall: aFunctionCall [
 	builder pushRegister: 'rax'.
 ]
 
-{ #category : #visiting }
-PhPharoCompiler >> compileMultiply: addNode [
+{ #category : #compiling }
+PhPharoCompiler >> compileMultiply: multiplyNode [
 	
-	addNode receiver acceptVisitor: self.
-	addNode arguments first acceptVisitor: self.
-	
-	"Put the second operand in rbx"
-	builder popRegister: 'rbx'.
-	"Put the first operand in rax"
-	builder popRegister: 'rax'.
-	"subtract them"
-	builder multiplyRegister: 'rbx' to: 'rax'.
-	
-	"Push the result to the stack"
-	builder pushRegister: 'rax'
+	self
+		compileBinaryOperator: multiplyNode
+		doing: [ :r1 :r2 |
+			builder multiplyRegister: r1 to: r2 ]
 ]
 
-{ #category : #visiting }
-PhPharoCompiler >> compileSubtract: addNode [
+{ #category : #compiling }
+PhPharoCompiler >> compileSubtract: subtractNode [
 	
-	addNode receiver acceptVisitor: self.
-	addNode arguments first acceptVisitor: self.
-	
-	"Put the second operand in rbx"
-	builder popRegister: 'rbx'.
-	"Put the first operand in rax"
-	builder popRegister: 'rax'.
-	"subtract them"
-	builder subtractRegister: 'rbx' to: 'rax'.
-	
-	"Push the result to the stack"
-	builder pushRegister: 'rax'
+	self
+		compileBinaryOperator: subtractNode
+		doing: [ :r1 :r2 |
+			builder subtractRegister: r1 to: r2 ]
 ]
 
 { #category : #initialization }
