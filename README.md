@@ -15,6 +15,7 @@ Coming:
  - a debugger and disassembler
  - management of arrays and structures
  - a bit on parsing either using Smacc as a grammar-based parser generator, or petit parser using parser combinators, or both
+ - an elf reader for linuxes
 
 ## Dependencies
 
