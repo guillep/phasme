@@ -1,11 +1,11 @@
 Class {
-	#name : #PhASMTests,
+	#name : #PhASMTest,
 	#superclass : #TestCase,
 	#category : #'Phasme-Tests'
 }
 
 { #category : #tests }
-PhASMTests >> testMove [
+PhASMTest >> testMove [
 
 	| phasme compiledPhasme simulator |
 	phasme := PhASM new build: [ :builder | 
@@ -22,7 +22,7 @@ PhASMTests >> testMove [
 ]
 
 { #category : #tests }
-PhASMTests >> testPush [
+PhASMTest >> testPush [
 
 	| phasme compiledPhasme simulator |
 	phasme := PhASM new build: [ :builder | 

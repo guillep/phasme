@@ -1,18 +1,18 @@
 Class {
-	#name : #PhSimpleCompilerTests,
+	#name : #PhPharoStackCompilerTest,
 	#superclass : #TestCase,
 	#category : #'Phasme-Tests'
 }
 
 { #category : #tests }
-PhSimpleCompilerTests >> compile: pharoMethodSource [
+PhPharoStackCompilerTest >> compile: pharoMethodSource [
 
 	^ PhPharoCompiler compileMethod: pharoMethodSource.
 	
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> compileFunctions: aCollection [
+PhPharoStackCompilerTest >> compileFunctions: aCollection [
 
 	| compiler |
 	compiler := PhPharoCompiler new.
@@ -21,7 +21,7 @@ PhSimpleCompilerTests >> compileFunctions: aCollection [
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> execute: compiledPhasme [
+PhPharoStackCompilerTest >> execute: compiledPhasme [
 	
 	| simulator |
 	simulator := PhASMSimulator on: compiledPhasme.
@@ -32,7 +32,7 @@ PhSimpleCompilerTests >> execute: compiledPhasme [
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> testCompileConditional [
+PhPharoStackCompilerTest >> testCompileConditional [
 
 	| program result |
 	program := self compileFunctions: {
@@ -47,7 +47,7 @@ PhSimpleCompilerTests >> testCompileConditional [
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> testCompileEqualsFalse [
+PhPharoStackCompilerTest >> testCompileEqualsFalse [
 
 	| program result |
 	program := self compile: '_main ^ 1 = 7'.
@@ -56,7 +56,7 @@ PhSimpleCompilerTests >> testCompileEqualsFalse [
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> testCompileEqualsFalseWithFullRAX [
+PhPharoStackCompilerTest >> testCompileEqualsFalseWithFullRAX [
 
 	| program result |
 	program := self compileFunctions: {
@@ -72,7 +72,7 @@ PhSimpleCompilerTests >> testCompileEqualsFalseWithFullRAX [
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> testCompileEqualsTrue [
+PhPharoStackCompilerTest >> testCompileEqualsTrue [
 
 	| program result |
 	program := self compile: '_main ^ 2 = 2'.
@@ -81,7 +81,7 @@ PhSimpleCompilerTests >> testCompileEqualsTrue [
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> testCompileEqualsTrueWithFullRAX [
+PhPharoStackCompilerTest >> testCompileEqualsTrueWithFullRAX [
 
 	| program result |
 	program := self compileFunctions: {
@@ -97,7 +97,7 @@ PhSimpleCompilerTests >> testCompileEqualsTrueWithFullRAX [
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> testCompileFunctionCall [
+PhPharoStackCompilerTest >> testCompileFunctionCall [
 
 	| program result |
 	program := self compileFunctions: {
@@ -109,7 +109,7 @@ PhSimpleCompilerTests >> testCompileFunctionCall [
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> testCompileFunctionCallWithArguments [
+PhPharoStackCompilerTest >> testCompileFunctionCallWithArguments [
 
 	| program result |
 	program := self compileFunctions: {
@@ -121,7 +121,7 @@ PhSimpleCompilerTests >> testCompileFunctionCallWithArguments [
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> testCompileImplicitReturn [
+PhPharoStackCompilerTest >> testCompileImplicitReturn [
 
 	| program result |
 	program := self compile: '_main'.
@@ -130,7 +130,7 @@ PhSimpleCompilerTests >> testCompileImplicitReturn [
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> testCompileLocalVariables [
+PhPharoStackCompilerTest >> testCompileLocalVariables [
 
 	| program result |
 	program := self compile: '_main | a | 
@@ -141,7 +141,7 @@ PhSimpleCompilerTests >> testCompileLocalVariables [
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> testCompileMultiply [
+PhPharoStackCompilerTest >> testCompileMultiply [
 
 	| program result |
 	program := self compile: '_main ^ 2 * 3'.
@@ -150,7 +150,7 @@ PhSimpleCompilerTests >> testCompileMultiply [
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> testCompileReturnValue [
+PhPharoStackCompilerTest >> testCompileReturnValue [
 
 	| program result |
 	program := self compile: '_main ^ 17'.
@@ -159,7 +159,7 @@ PhSimpleCompilerTests >> testCompileReturnValue [
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> testCompileSubtract [
+PhPharoStackCompilerTest >> testCompileSubtract [
 
 	| program result |
 	program := self compile: '_main ^ 2 - 1'.
@@ -168,7 +168,7 @@ PhSimpleCompilerTests >> testCompileSubtract [
 ]
 
 { #category : #tests }
-PhSimpleCompilerTests >> testCompileSum [
+PhPharoStackCompilerTest >> testCompileSum [
 
 	| program result |
 	program := self compile: '_main ^ 1 + 2'.
